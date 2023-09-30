@@ -16,7 +16,7 @@
         android:scaleType="fitStart"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/imageView4"
-        app:srcCompat="@drawable/Departamento_icone" />
+        app:srcCompat="@drawable/departamento_icone" />
 
     <ImageButton
         android:id="@+id/imageView3"
@@ -28,7 +28,7 @@
         android:scaleType="fitStart"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/imageView"
-        app:srcCompat="@drawable/Alocacao_icone" />
+        app:srcCompat="@drawable/alocacao_icone" />
 
     <ImageButton
         android:id="@+id/imageView4"
@@ -39,33 +39,35 @@
         android:background="#00FFFFFF"
         android:clickable="true"
         android:scaleType="centerInside"
-        android:src="@drawable/Curso_icone"
+        android:src="@drawable/curso_icone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
-    <TextView
+    <ImageView
         android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="Foto do Banner"
-        android:textSize="100sp"
+        android:layout_width="416dp"
+        android:layout_height="315dp"
+        android:adjustViewBounds="true"
+        android:cropToPadding="true"
+        android:scaleType="centerCrop"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/banner_teste" />
 
     <ImageButton
         android:id="@+id/imageView"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_marginStart="40dp"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="32dp"
         android:background="#00FFFFFF"
         android:clickable="true"
         android:scaleType="fitStart"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2"
-        app:srcCompat="@drawable/Professor_icone" />
+        app:srcCompat="@drawable/professor_icone" />
 
     <TextView
         android:id="@+id/textView2"
