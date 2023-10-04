@@ -32,7 +32,7 @@
         android:layout_width="match_parent"
         android:layout_below="@id/app_bar"
         android:layout_height="match_parent"
-        tools:listitem="@layout/teste_nomes"
+        tools:listitem="@layout/item_view"
         android:visibility="visible"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
