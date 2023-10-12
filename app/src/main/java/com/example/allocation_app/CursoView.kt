@@ -55,6 +55,32 @@ class CursoView : AppCompatActivity() {
         // Implemente a lógica para adicionar um novo curso à lista aqui
     }
 
+    private fun deleteCourse(courseId: Int){
+        val call = courseService.deleteById(courseId)
+        call.enqueue(object : Callback<Void>{
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+               if (response.isSuccessful) {
+                   Toast.makeText(
+                       applicationContext,
+                       "Curso excluido com Sucesso.",
+                       Toast.LENGTH_LONG
+                   ).show()
+               }
+
+            }
+
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                Toast.makeText(
+                    applicationContext,
+                    "Falha ao executar a requisição.",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+
+        })
+
+    }
+
     // Implemente a classe ItemTouchHelperCallback para lidar com arrastar e excluir
     inner class ItemTouchHelperCallback : ItemTouchHelper.SimpleCallback(
         0, // Não estamos implementando arrastar, então definimos para 0
@@ -69,10 +95,20 @@ class CursoView : AppCompatActivity() {
         }
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+           val position = viewHolder.adapterPosition
+           val deletedCourse = adapter.courses[position]
+
+           //Remove o curso do Recicleview
             adapter.courses.removeAt(viewHolder.adapterPosition)
             adapter.notifyItemRemoved(viewHolder.adapterPosition)
+
+            // agora se consegue excluir o curso da API usando ID
+            deletedCourse.id?.let { deleteCourse(it) }
+
         }
     }
+
+
 
     private fun loadCourses() {
         executeAsync(courseService.listAll(), object : Callback<List<Course>> {
@@ -81,7 +117,8 @@ class CursoView : AppCompatActivity() {
                 if (response.isSuccessful) {
                     val courses = response.body() // Obtenha os cursos da resposta
                     adapter.courses.addAll(
-                        courses ?: emptyList()
+
+                   courses ?: emptyList()
                     ) // Atualize o adaptador com os cursos
                     adapter.notifyDataSetChanged()
                 }
