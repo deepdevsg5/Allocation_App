@@ -15,7 +15,7 @@
         android:theme="@style/Theme.Allocation_App"
         tools:targetApi="31" >
         <activity
-            android:name=".CursoView"
+            android:name=".views.CursoView"
             android:exported="false" />
         <activity
             android:name=".Home"

@@ -4,7 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageButton
-import androidx.activity.result.contract.ActivityResultContracts
+import com.example.allocation_app.views.CursoView
 
 class Home : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
