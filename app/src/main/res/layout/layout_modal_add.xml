@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_centerVertical="true"
+    android:layout_centerHorizontal="true"
+    android:layout_gravity="center">
+
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Adicionar Item"
+        android:textSize="30sp"
+        android:layout_centerHorizontal="true"
+        android:textAlignment="center"
+        android:layout_marginTop="16dp" />
+
+
+
+    <EditText
+        android:id="@+id/txt_add_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/title"
+        android:hint="Nome do Item"
+        android:layout_margin="8dp" />
+
+    <EditText
+        android:id="@+id/txt_add_cpf"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txt_add_name"
+        android:hint="Digite o numero do cpf"
+        android:layout_margin="8dp"
+
+        android:visibility="gone"/>
+
+    <EditText
+        android:id="@+id/txt_add_idDepartment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txt_add_cpf"
+        android:hint="Digite o id do Departmento"
+        android:layout_margin="8dp"
+        android:visibility="gone"/>
+
+    <EditText
+        android:id="@+id/txt_add_idProfessor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txt_add_idDepartment"
+        android:hint="Digite o id do Professor"
+        android:layout_margin="8dp"
+        android:visibility="gone"/>
+
+    <EditText
+        android:id="@+id/txt_add_idCourse"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txt_add_idProfessor"
+        android:hint="Digite o id do Curso"
+        android:layout_margin="8dp"
+        android:visibility="gone"/>
+
+    <EditText
+        android:id="@+id/txt_add_hourStart"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txt_add_idCourse"
+        android:hint="Digite a hora de inicio"
+        android:layout_margin="8dp"
+        android:visibility="gone"/>
+
+    <EditText
+        android:id="@+id/txt_add_hourEnd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txt_add_hourStart"
+        android:hint="Digite a hora de termino"
+        android:layout_margin="8dp"
+        android:visibility="gone"/>
+
+
+
+</RelativeLayout>
