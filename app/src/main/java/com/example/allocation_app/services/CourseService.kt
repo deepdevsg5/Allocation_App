@@ -19,7 +19,6 @@ interface CourseService {
 
 
 
-
     @DELETE("course/{id}")
     fun deleteById(@Path("id") id : Int): Call<Void>
 

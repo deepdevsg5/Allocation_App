@@ -1,9 +1,7 @@
 package com.example.allocation_app.views
 
 import android.os.Bundle
-import android.util.Log
 import android.widget.EditText
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -23,7 +21,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.util.List
 
 
 class CursoView : AppCompatActivity() {
@@ -45,7 +42,8 @@ class CursoView : AppCompatActivity() {
         courseService = RetrofitConfig.courseService()
 
         // Inicialize o Adapter e o RecyclerView e atribua a recyclerView diretamente à propriedade da classe
-        recyclerView = findViewById(R.id.recycler_view_registered) // Initialize the recyclerView here
+        recyclerView =
+            findViewById(R.id.recycler_view_registered) // Initialize the recyclerView here
         adapter = CourseAdapter(mutableListOf())
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -74,134 +72,66 @@ class CursoView : AppCompatActivity() {
 
     }
 
-    private fun showIdLocationDialog() {
-        val view = layoutInflater.inflate(R.layout.layout_modal_find , null)
-        val findIdTxt = view.findViewById<EditText>(R.id.txt_modal_find_id)
 
-        val dialogBuilder = AlertDialog.Builder(this)
-        dialogBuilder.setView(view)
-        dialogBuilder.setPositiveButton("Procurar"){ dialog, which ->
-            val courseId = findIdTxt.text.toString().toIntOrNull()
-            if (courseId != null){
-                val position = findCoursePosition(courseId)
-                if(position != -1){
-                  findById(courseId)
-                } else{
-                   recyclerView.postDelayed({Toast.makeText(
-                       applicationContext,
-                       "Curso com ID $courseId Não Encontrado. ",
-                       Toast.LENGTH_LONG
-                   ).show()}, 400)
+
+
+    // Função para carregar cursos da API
+    private fun loadCourses() {
+        val call = courseService.listAll()
+        call.enqueue(object : Callback<kotlin.collections.List<Course>> {
+            override fun onResponse(
+                call: Call<kotlin.collections.List<Course>>,
+                response: Response<kotlin.collections.List<Course>>
+            ) {
+                val courses = response.body() // Obtenha os cursos da resposta
+
+                if (courses != null) {
+                    adapter.reloadList(courses)
                 }
-
             }
 
-        }
-        dialogBuilder.setNegativeButton("Cancelar", null)
-        val alertDialog = dialogBuilder.create()
-        alertDialog.show()
-
-
-    }
-
-    private fun findById(courseId: Int) {
-        try {
-            val position = findCoursePosition(courseId)
-            if(position != -1){
-                recyclerView.smoothScrollToPosition(position)
-            } else{
+            override fun onFailure(call: Call<kotlin.collections.List<Course>>, t: Throwable) {
                 Toast.makeText(
                     applicationContext,
-                    "Curso com ID $courseId Não Encontrado. ",
+                    "Falha ao executar Requisição.",
                     Toast.LENGTH_LONG
                 ).show()
-            }
-
-        } catch (e:Exception){
-            e.printStackTrace()
-            Toast.makeText(applicationContext, "Erro ao buscar o Curso", Toast.LENGTH_SHORT).show()
-        }
-
-
-
-    }
-
-    private fun findCoursePosition(courseId: Int) : Int {
-       for (i in adapter.itens.indices){
-           if(adapter.itens[i].id == courseId){
-               return i
-           }
-       }
-
-
-        return -1 // O Curso não foi encontrado na lista
-
-    }
-
-    private fun initSearchView(){
-        searchView = findViewById(R.id.searchView)
-        searchView.setOnQueryTextListener(object : OnQueryTextListener{
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                return false
-            }
-
-            override fun onQueryTextChange(query: String?): Boolean {
-                if(query != null) {
-                    val listIsEmpty = adapter.setFilteredList(query)
-                    if(listIsEmpty){
-                        Toast.makeText(applicationContext,"Curso Não Encontrado",Toast.LENGTH_LONG).show()
-                    }
-                } else{
-                    adapter.clearSearch()
-                }
                 loadCourses()
-                return true
-
-
             }
-
         })
-
     }
 
     // abre uma janela para interação com usuário
-    private fun showAddCourseDialog(){
-       val dialog = AlertDialog.Builder(this)
-       val view = layoutInflater.inflate(R.layout.layout_modal_add_course, null)
+    private fun showAddCourseDialog() {
+        val dialog = AlertDialog.Builder(this)
+        val view = layoutInflater.inflate(R.layout.layout_modal_add_course, null)
 
         // abre o modal
         dialog.setView(view)
 
-      // Botões - salvar e cancelar
-        dialog.setPositiveButton("Adicionar") {_,_ ->
-        //extrai os detalhes do curso do modal
-        val courseName = view.findViewById<EditText>(R.id.txt_modal_add_name).text.toString()
+        // Botões - salvar e cancelar
+        dialog.setPositiveButton("Adicionar") { _, _ ->
+            //extrai os detalhes do curso do modal
+            val courseName = view.findViewById<EditText>(R.id.txt_modal_add_name).text.toString()
 
-        if (courseName.isNotBlank()){
-            val newCourse = Course(name = courseName)
-            addCourse(newCourse)
-            ScrollToLastPosition.withDelay(recyclerView,adapter,2000)
-        } else {
-            Toast.makeText(
-                applicationContext,
-                "Nome de curso não pode estar Branco",
-                Toast.LENGTH_LONG
-            ).show()
+            if (courseName.isNotBlank()) {
+                val newCourse = Course(name = courseName)
+                addCourse(newCourse)
+                ScrollToLastPosition.withDelay(recyclerView, adapter, 2000)
+            } else {
+                Toast.makeText(
+                    applicationContext,
+                    "Nome de curso não pode estar Branco",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+
+
         }
 
-
-        }
-
-        dialog.setNegativeButton("Cancelar",null)
+        dialog.setNegativeButton("Cancelar", null)
         dialog.show()
-
-
-
     }
-
-
-
-
 
     // Adicionar curso
     fun addCourse(newCourse: Course) {
@@ -210,11 +140,11 @@ class CursoView : AppCompatActivity() {
         call.enqueue(object : Callback<Course> {
             override fun onResponse(call: Call<Course>, response: Response<Course>) {
                 if (response.isSuccessful) {
-                   Toast.makeText(
-                       applicationContext,
-                       "Curso adicionado com sucesso",
-                       Toast.LENGTH_LONG
-                   ).show()
+                    Toast.makeText(
+                        applicationContext,
+                        "Curso adicionado com sucesso",
+                        Toast.LENGTH_LONG
+                    ).show()
                     loadCourses()
                 }
 
@@ -230,17 +160,91 @@ class CursoView : AppCompatActivity() {
         })
     }
 
-    private fun deleteCourse(courseId: Int){
+    //Procurar curso por Id
+    private fun showIdLocationDialog() {
+        val view = layoutInflater.inflate(R.layout.layout_modal_find, null)
+        val findIdTxt = view.findViewById<EditText>(R.id.txt_modal_find_id)
+
+        val dialogBuilder = AlertDialog.Builder(this)
+        dialogBuilder.setView(view)
+
+        dialogBuilder.setPositiveButton("Procurar") { dialog, which ->
+            val courseId = findIdTxt.text.toString().toIntOrNull()
+
+            if (courseId != null) {
+                val position = findCoursePosition(courseId)
+                if (position != -1) {
+                    recyclerView.smoothScrollToPosition(position)
+                } else {
+                    Toast.makeText(applicationContext, "Curso com ID $courseId não encontrado.", Toast.LENGTH_LONG).show()
+                }
+            } else {
+                Toast.makeText(applicationContext, "ID de curso inválido.", Toast.LENGTH_LONG).show()
+            }
+        }
+
+        dialogBuilder.setNegativeButton("Cancelar", null)
+
+        val alertDialog = dialogBuilder.create()
+        alertDialog.show()
+    }
+
+    private fun findCoursePosition(courseId: Int): Int {
+        for (i in adapter.itens.indices) {
+            if (adapter.itens[i].id == courseId) {
+                return i
+            }
+        }
+
+
+        return -1 // O Curso não foi encontrado na lista
+
+
+    }
+
+    //encontrar por Nome usando SearchView
+    private fun initSearchView() {
+        searchView = findViewById(R.id.searchView)
+        searchView.setOnQueryTextListener(object : OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(query: String?): Boolean {
+                if (query != null) {
+                    val isEmpty = adapter.setFilteredList(query) // Filtra a lista no adaptador
+                    if (isEmpty) {
+                        Toast.makeText(
+                            applicationContext,
+                            "Curso não encontrado.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                } else {
+                    adapter.clearSearch()
+
+                }
+                return true
+            }
+
+        })
+
+
+    }
+
+
+
+    private fun deleteCourse(courseId: Int) {
         val call = courseService.deleteById(courseId)
-        call.enqueue(object : Callback<Void>{
+        call.enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
-               if (response.isSuccessful) {
-                   Toast.makeText(
-                       applicationContext,
-                       "Curso excluido com Sucesso.",
-                       Toast.LENGTH_LONG
-                   ).show()
-               }
+                if (response.isSuccessful) {
+                    Toast.makeText(
+                        applicationContext,
+                        "Curso excluido com Sucesso.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
 
             }
 
@@ -270,10 +274,10 @@ class CursoView : AppCompatActivity() {
         }
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-           val position = viewHolder.adapterPosition
-           val deletedCourse = adapter.filteredList[position]
+            val position = viewHolder.adapterPosition
+            val deletedCourse = adapter.filteredList[position]
 
-           //Remove o curso do Recicleview
+            //Remove o curso do Recicleview
             adapter.itens.removeAt(viewHolder.adapterPosition)
             adapter.notifyItemRemoved(viewHolder.adapterPosition)
 
@@ -285,43 +289,7 @@ class CursoView : AppCompatActivity() {
 
 
 
-    // Função para carregar cursos da API
-    private fun loadCourses() {
-        val call = courseService.listAll()
-        call.enqueue( object : Callback<kotlin.collections.List<Course>>{
-            override fun onResponse(
-                call: Call<kotlin.collections.List<Course>>,
-                response: Response<kotlin.collections.List<Course>>
-            ) {
-                val courses = response.body() // Obtenha os cursos da resposta
-
-                if (courses != null) {
-                    // Certifique-se de que courses não seja nulo
-                    adapter.itens.clear()
-                    adapter.itens.addAll(courses)// Adicionando os cursos carregados na lista filteredList durante a inicialização da tela, você garante que a lista completa de cursos seja exibida assim que a tela é carregada
-                    adapter.filteredList.addAll(adapter.itens) // adiciona os cursos para poder ser consultado
-                    adapter.notifyDataSetChanged()
-
-                 }
-            }
-
-            override fun onFailure(call: Call<kotlin.collections.List<Course>>, t: Throwable) {
-                Toast.makeText(
-                    applicationContext,
-                    "Falha ao executar Requisição.",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-        })
-    }
-
-    // Função genérica para fazer chamadas assíncronas
-    private fun <T> executeAsync(call: Call<T>, callback: Callback<T>) {
-        call.enqueue(callback)
-    }
-
 }
-
 
 
 

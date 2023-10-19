@@ -10,7 +10,7 @@ object ScrollToLastPosition {
         val handler = Handler(Looper.getMainLooper())
         handler.postDelayed({
 
-            val lastPosition = adapter.itemCount - 1
+            val lastPosition = adapter.itemCount
             recyclerView.smoothScrollToPosition(lastPosition)
         }, delayMillis)
     }

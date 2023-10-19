@@ -39,6 +39,19 @@ abstract class AdapterDefault<T : Any>(var itens: MutableList<T>):RecyclerView.A
 
     }
     abstract fun filterCondition(item: T, query: String):Boolean
+    fun reloadList(courses: List<T>){
+        itens.clear()
+        courses?.let { // ? igual a IF (se a lista de Cursos for vazia
+            itens.addAll(it)
+
+        }
+        filteredList.clear()
+             courses?.let {
+                 filteredList.addAll(it)
+             }
+        notifyDataSetChanged()
+    }
+
 
 
     inner class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
