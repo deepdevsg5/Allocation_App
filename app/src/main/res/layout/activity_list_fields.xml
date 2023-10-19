@@ -19,10 +19,17 @@
                 android:id="@+id/toolbar"
                 android:background="#a4ddf8"
                 android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-                app:title="CursoView"
+                app:title="Título padrão da ToolBar"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent">
             </androidx.appcompat.widget.Toolbar>
+
+            <androidx.appcompat.widget.SearchView
+                android:id="@+id/searchView"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:backgroundTint="@color/white"/>
+
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -37,6 +44,21 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_find"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/fab_add"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="25dp"
+        android:clickable="true"
+        app:backgroundTint="@android:color/holo_blue_light"
+        app:rippleColor="@android:color/darker_gray"
+        app:srcCompat="@drawable/idfileinacircleoutline_80687"
+        app:maxImageSize="30dp"
+        app:fabCustomSize="40dp"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -47,7 +69,8 @@
         android:clickable="true"
         app:srcCompat="@drawable/baseline_add_24"
         app:backgroundTint="@android:color/holo_blue_light"
-        app:rippleColor="@android:color/darker_gray"/>
+        app:rippleColor="@android:color/darker_gray"
+        app:fabCustomSize="40dp"/>
 
 </RelativeLayout>
 
