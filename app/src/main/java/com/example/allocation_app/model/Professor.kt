@@ -13,10 +13,12 @@ data class Professor(
     val cpf: String,
 
     @SerializedName("department_id")
-    val departmentId: Int,
+    val departmentId: Int? ,
 
      // Campo para armazenar o nome do departamento
     var departmentName: String? = null,
 
-    var department: Department? // Inclua a propriedade do departamento
-)
+    var department: Department? = null // Inclua a propriedade do departamento
+) {
+    companion object
+}

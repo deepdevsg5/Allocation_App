@@ -1,8 +1,6 @@
 package com.example.allocation_app.views
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.widget.EditText
 import android.widget.TextView
@@ -20,6 +18,7 @@ import com.example.allocation_app.adapter.DepartmentAdapter
 import com.example.allocation_app.config.RetrofitConfig
 import com.example.allocation_app.model.Department
 import com.example.allocation_app.services.DepartmentService
+import com.example.allocation_app.util.ScrollToLastPosition
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import retrofit2.Call
 import retrofit2.Callback
@@ -60,9 +59,9 @@ class DepartmentView : AppCompatActivity() {
 
         //Tornar clicacel os itens do adpter
         adapter.onItemClick = { position ->
-            val course = adapter.itens[position]
-            course.id?.let { courseId ->
-                showUpdateDepartmentDialog(courseId, course.name)
+            val department = adapter.filteredList[position]
+            department.id?.let { departmentId ->
+                showUpdateDepartmentDialog(department)
             }
         }
 
@@ -85,54 +84,22 @@ class DepartmentView : AppCompatActivity() {
 
     }
 
-    //encontrar por Nome usando SearchView
-    private fun initiSearchView() {
-        searchView = findViewById(R.id.searchView)
-        searchView.setOnQueryTextListener(object : OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                return false
-            }
-
-            override fun onQueryTextChange(query: String?): Boolean {
-                if (query != null) {
-                    val isEmpty = adapter.setFilteredList(query) // Filtra a lista no adaptador
-                    if (isEmpty) {
-                        Toast.makeText(
-                            applicationContext,
-                            "Departamento não encontrado.",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                } else {
-                  //  adapter.notifyDataSetChanged()// Se a consulta estiver vazia, você pode realizar ações relevantes aqui
-                    adapter.clearSearch()
-
-                }
-                loadDepartments()
-                return true
-            }
-
-        })
-
-
-    }
-
 
     private fun showAddDepartmentDialog() {
         val dialog = AlertDialog.Builder(this)
         val view = layoutInflater.inflate(R.layout.layout_modal_add, null)
         dialog.setView(view)
+        val departmentNameEditText = view.findViewById<EditText>(R.id.txt_add_name)
 
         // Configurar os elementos do modal, como EditTexts, botões, etc., para permitir ao usuário inserir os detalhes do curso.
 
         dialog.setPositiveButton("Adicionar") { _, _ ->
-            // Extrair os detalhes do curso do modal
-            val departmentName = view.findViewById<EditText>(R.id.txt_add_name).text.toString()
-
+            // Extrair os detalhes do department do modal
+            val departmentName = departmentNameEditText.text.toString()
             if (departmentName.isNotBlank()) {
-                val newDeparment = Department(name = departmentName) // Criar um objeto Course com os detalhes inseridos
+                val newDeparment = Department(name = departmentName) // Criar um objeto  com os detalhes inseridos
                 addDepartment(newDeparment) // Enviar o novo curso para o servidor usando o Retrofit
-                scrollToLastPositionWithDelay(recyclerView, adapter, 2000)
+                ScrollToLastPosition.withDelay(recyclerView,adapter,2000)
             } else {
                 Toast.makeText(
                     applicationContext,
@@ -151,7 +118,6 @@ class DepartmentView : AppCompatActivity() {
     private fun addDepartment(newDepartment: Department) {
         val call = departmentService.save(newDepartment)
 
-
         call.enqueue(object : Callback<Department> {
             override fun onResponse(call: Call<Department>, response: Response<Department>) {
                 if (response.isSuccessful) {
@@ -162,45 +128,31 @@ class DepartmentView : AppCompatActivity() {
                         ).show()
                     //val addedCourse = response.body() // Curso adicionado retornado pelo servidor
                     // Atualize a UI ou faça qualquer ação necessária após adicionar o curso
-                    adapter.filteredList.clear()
                     loadDepartments()
-
                 }
             }
 
             override fun onFailure(call: Call<Department>, t: Throwable) {
-                // Lida com falhas na chamada à API, se necessário
+                Toast.makeText(
+                    applicationContext,
+                    "Falha ao executar a Requisição"
+                    ,Toast.LENGTH_LONG
+                ).show()
             }
         })
-    }
-
-    fun scrollToLastPositionWithDelay(
-        recyclerView: RecyclerView,
-        adapter: RecyclerView.Adapter<*>,
-        delayMillis: Long = 1000 // Valor padrão de 1000 milissegundos (1 segundo)
-    ) {
-        val handler = Handler(Looper.getMainLooper())
-
-        handler.postDelayed({
-            val lastPosition = adapter.itemCount - 1
-            recyclerView.smoothScrollToPosition(lastPosition)
-        }, delayMillis)
     }
 
 
     // Função para carregar cursos da API
     private fun loadDepartments() {
-        executeAsync(departmentService.listAll(), object : Callback<List<Department>> {
+        val call = departmentService.listAll()
+        call.enqueue( object : Callback<List<Department>> {
             override fun onResponse(call: Call<List<Department>>, response: Response<List<Department>>) {
                 if (response.isSuccessful) {
-                    val department = response.body() // Obtenha os cursos da resposta
+                    val departments = response.body() // Obtenha os cursos da resposta
 
-                    if (department != null) {
-                        // Certifique-se de que courses não seja nulo
-                        adapter.itens.clear()
-                        adapter.itens.addAll(department)// Adicionando os cursos carregados na lista filteredList durante a inicialização da tela, você garante que a lista completa de cursos seja exibida assim que a tela é carregada
-                        adapter.filteredList.addAll(department) // adiciona os cursos para poder ser consultado
-                        adapter.notifyDataSetChanged()
+                    if (departments != null) {
+                        adapter.reloadList(departments)
                     }
                 }
             }
@@ -211,13 +163,9 @@ class DepartmentView : AppCompatActivity() {
                     "Falha ao executar Requisição.",
                     Toast.LENGTH_LONG
                 ).show()
+                loadDepartments()
             }
         })
-    }
-
-    // Função genérica para fazer chamadas assíncronas
-    private fun <T> executeAsync(call: Call<T>, callback: Callback<T>) {
-        call.enqueue(callback)
     }
 
     private fun showIdLocation() {
@@ -226,13 +174,14 @@ class DepartmentView : AppCompatActivity() {
 
         val dialogBuilder = AlertDialog.Builder(this)
         dialogBuilder.setView(view)
+
         dialogBuilder.setPositiveButton("Procurar") { dialog, which ->
             val departmentId = editText.text.toString().toIntOrNull()
 
             if (departmentId != null) {
                 val position = findDepartmentPosition(departmentId)
                 if (position != -1) {
-                    findById(departmentId)
+                    recyclerView.smoothScrollToPosition(position)
                 } else {
                     // Agende a exibição do Toast após um pequeno atraso
                     recyclerView.postDelayed({
@@ -262,43 +211,83 @@ class DepartmentView : AppCompatActivity() {
 
     }
 
-    internal fun findById(departmentID: Int) {
-        try {
-            val position = findDepartmentPosition(departmentID)
-            if (position != -1) {
-                recyclerView.smoothScrollToPosition(position)
-            } else {
-                Toast.makeText(
-                    applicationContext,
-                    "Departamento com ID $departmentID não encontrado.",
-                    Toast.LENGTH_LONG
-                ).show()
-
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(
-                applicationContext,
-                "Erro ao buscar o Departamento.",
-                Toast.LENGTH_LONG
-            ).show()
-
-        }
-    }
 
     private fun findDepartmentPosition(departmentId: Int): Int {
-        for (i in adapter.itens.indices) {
-            if (adapter.itens[i].id == departmentId) {
+        for (i in adapter.items.indices) {
+            if (adapter.items[i].id == departmentId) {
                 return i
             }
         }
         return -1 // Retorna -1 se o curso não for encontrado na lista
     }
 
+    //encontrar por Nome usando SearchView
+    private fun initiSearchView() {
+        searchView = findViewById(R.id.searchView)
+        searchView.setOnQueryTextListener(object : OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(query: String?): Boolean {
+                if (query != null) {
+                    val isEmpty = adapter.setFilteredList(query) // Filtra a lista no adaptador
+                    if (isEmpty) {
+                        Toast.makeText(
+                            applicationContext,
+                            "Departamento não encontrado.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                } else {
+                    //  adapter.notifyDataSetChanged()// Se a consulta estiver vazia, você pode realizar ações relevantes aqui
+                    adapter.clearSearch()
+
+                }
+                return true
+            }
+
+        })
+
+
+    }
+
+
+    private fun showUpdateDepartmentDialog(department: Department) {
+        val dialog = AlertDialog.Builder(this)
+        val view = layoutInflater.inflate(R.layout.layout_modal_update, null)
+        dialog.run {
+            setView(view)
+        }
+
+        val updateName: EditText = view.findViewById(R.id.txt_att_Name)
+        val idModalUpdate: TextView = view.findViewById(R.id.txt_att_id)
+
+        idModalUpdate.text = department.id.toString()
+        updateName.setText(department.name)
+
+        dialog.setPositiveButton("Atualiza") {_,_ ->
+            val newName = updateName.text.toString()
+            if (newName.isNotBlank()) {
+                department.id?.let { updateDepartmentName(it, newName) }
+            } else {
+                Toast.makeText(
+                    applicationContext,
+                    "Nome do Departamento não pode estar em branco",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+
+        dialog.setNegativeButton("Cancelar", null)
+
+        dialog.show()
+
+    }
 
     // funcao para editar curso
-    private fun updateDepartmentName(courseId: Int, newName: String) {
-        val call = departmentService.update(courseId, Department(name = newName))
+    private fun updateDepartmentName(departmentId: Int, newName: String) {
+        val call = departmentService.update(departmentId, Department(name = newName))
 
         call.enqueue(object : Callback<Department> {
             override fun onResponse(call: Call<Department>, response: Response<Department>) {
@@ -308,7 +297,6 @@ class DepartmentView : AppCompatActivity() {
                         "Nome do Departamento atualizado com sucesso.",
                         Toast.LENGTH_LONG
                     ).show()
-                    adapter.filteredList.clear()
                     loadDepartments()
                 } else {
                     val errorBody = response.errorBody()?.string()
@@ -332,48 +320,7 @@ class DepartmentView : AppCompatActivity() {
     }
 
 
-    private fun showUpdateDepartmentDialog(DepartmentId: Int, currentName: String) {
-        val dialog = AlertDialog.Builder(this)
-        val view = layoutInflater.inflate(R.layout.layout_modal_update, null)
-        dialog.run {
-            setView(view)
-        }
 
-        // Aqui você deve usar a função findCoursePosition para encontrar a posição do curso no adaptador
-        val position = findDepartmentPosition(DepartmentId)
-
-        if (position != -1) {
-            val editText: EditText = view.findViewById(R.id.txt_att_Name)
-            val idModalUpdate: TextView = view.findViewById(R.id.txt_att_id)
-
-            idModalUpdate.text = DepartmentId.toString()
-            editText.setText(currentName)
-
-            dialog.setPositiveButton("Atualizar") { _, _ ->
-                val newName = editText.text.toString()
-
-                if (newName.isNotBlank()) {
-                    updateDepartmentName(DepartmentId, newName)
-                } else {
-                    Toast.makeText(
-                        applicationContext,
-                        "Nome do Departamento não pode estar em branco",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-            }
-
-            dialog.setNegativeButton("Cancelar", null)
-
-            dialog.show()
-        } else {
-            Toast.makeText(
-                applicationContext,
-                "Curso com ID $DepartmentId não encontrado.",
-                Toast.LENGTH_LONG
-            ).show()
-        }
-    }
 
     private fun deleteDepartment(DepartmentId: Int, callback: (success: Boolean) -> Unit) {
         val call = departmentService.deleteById(DepartmentId)
@@ -435,7 +382,7 @@ class DepartmentView : AppCompatActivity() {
                     // A exclusão foi bem-sucedida, você pode tomar ações adicionais, se necessário.
                     // Por exemplo, recarregar a lista de cursos após a exclusão.
                     adapter.filteredList.removeAt(viewHolder.adapterPosition) // Remove da filteredList
-                    adapter.itens.remove(deletedDepartment) // Remove da lista original
+                    adapter.items.remove(deletedDepartment) // Remove da lista original
                     adapter.notifyItemRemoved(viewHolder.adapterPosition)
                     loadDepartments()
                 } else {

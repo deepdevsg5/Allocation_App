@@ -16,11 +16,6 @@ interface DepartmentService {
     @GET("department/list")
     fun listAll(): Call<List<Department>>
 
-    @GET("department/{id}")
-    fun findById(
-        @Path("id") id: Int
-    ): Call<Department>
-
     @POST("department/new")
     fun save(
         @Body department:Department

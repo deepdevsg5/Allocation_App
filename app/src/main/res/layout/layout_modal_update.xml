@@ -39,11 +39,29 @@
         android:layout_margin="8dp" />
 
     <EditText
-        android:id="@+id/txt_att_idDepartment"
+        android:id="@+id/txt_att_cpf"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/txt_att_Name"
-        android:hint="Digite o id do Departmento"
+        android:hint="Digite o novo cpf"
+        android:layout_margin="8dp"
+        android:visibility="gone"/>
+
+    <EditText
+        android:id="@+id/txt_att_idDepartment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txt_att_cpf"
+        android:hint="Digite novo id do Departamento"
+        android:layout_margin="8dp"
+        android:visibility="gone"/>
+
+    <EditText
+        android:id="@+id/txt_att_idCurso"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txt_att_idDepartment"
+        android:hint="Digite o novo id do curso"
         android:layout_margin="8dp"
         android:visibility="gone"/>
 
@@ -51,8 +69,8 @@
         android:id="@+id/txt_att_idProfessor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/txt_att_idDepartment"
-        android:hint="Digite o id do Professor"
+        android:layout_below="@id/txt_att_idCurso"
+        android:hint="Digite o novo id do Professor"
         android:layout_margin="8dp"
         android:visibility="gone"/>
 
@@ -61,7 +79,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/txt_att_idProfessor"
-        android:hint="Digite a hora de inicio"
+        android:hint="Digite a nova hora de inicio"
         android:layout_margin="8dp"
         android:visibility="gone"/>
 
@@ -70,7 +88,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/txt_att_hourStart"
-        android:hint="Digite a hora de termino"
+        android:hint="Digite a nova hora de termino"
         android:layout_margin="8dp"
         android:visibility="gone"/>
 

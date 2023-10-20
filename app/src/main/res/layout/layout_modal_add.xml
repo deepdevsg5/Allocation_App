@@ -35,7 +35,6 @@
         android:layout_below="@id/txt_add_name"
         android:hint="Digite o numero do cpf"
         android:layout_margin="8dp"
-
         android:visibility="gone"/>
 
     <EditText

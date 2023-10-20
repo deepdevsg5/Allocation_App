@@ -8,11 +8,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.allocation_app.model.Course
 import com.example.allocation_app.model.Department
 import com.example.allocation_app.model.Professor
+import java.util.List
 
-abstract class AdapterDefault<T : Any>(var itens: MutableList<T>) : RecyclerView.Adapter<AdapterDefault<T>.ViewHolder>() {
+abstract class AdapterDefault<T : Any>(var items: MutableList<T>) : RecyclerView.Adapter<AdapterDefault<T>.ViewHolder>() {
 
     // copia a lista de courses que foi pega da API
-    var filteredList = itens.toMutableList()
+    var filteredList = items.toMutableList()
 
     // Adicione uma propriedade para armazenar o layout do item
     var itemLayout: Int = R.layout.itens_fields_names
@@ -25,16 +26,28 @@ abstract class AdapterDefault<T : Any>(var itens: MutableList<T>) : RecyclerView
     //filtro da lista
     fun setFilteredList(query: String): Boolean {
         filteredList.clear()
-        filteredList.addAll(itens.filter { filterCondition(it, query) })
+        filteredList.addAll(items.filter { filterCondition(it, query) })
         notifyDataSetChanged()
         return filteredList.isEmpty()
     }
 
     fun clearSearch() {
         filteredList.clear()
-        filteredList.addAll(itens)
+        filteredList.addAll(items)
         notifyDataSetChanged()
     }
+
+    // Certifique-se de que courses não seja nulo
+    fun reloadList(newItemsList: List<T>?) {
+        items.clear()
+        newItemsList?.let { items.addAll(it) }
+        filteredList.clear()
+        newItemsList?.let { filteredList.addAll(it) }
+        notifyDataSetChanged()
+    }
+
+
+
 
     // para definir a condição de filtro específica para cada tipo de item.
     abstract fun filterCondition(item: T, query: String): Boolean

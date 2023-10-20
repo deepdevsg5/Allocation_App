@@ -1,9 +1,6 @@
 package com.example.allocation_app.views
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
@@ -20,6 +17,7 @@ import com.example.allocation_app.adapter.CourseAdapter
 import com.example.allocation_app.config.RetrofitConfig
 import com.example.allocation_app.model.Course
 import com.example.allocation_app.services.CourseService
+import com.example.allocation_app.util.ScrollToLastPosition
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import retrofit2.Call
 import retrofit2.Callback
@@ -60,9 +58,9 @@ class CursoView : AppCompatActivity() {
 
         //Tornar clicacel os itens do adpter
         adapter.onItemClick = { position ->
-            val course = adapter.itens[position]
+            val course = adapter.filteredList[position]
             course.id?.let { courseId ->
-                showUpdateCourseDialog(courseId, course.name)
+                showUpdateCourseDialog(course)
             }
         }
 
@@ -85,6 +83,111 @@ class CursoView : AppCompatActivity() {
 
     }
 
+
+    private fun showAddCourseDialog() {
+        val dialog = AlertDialog.Builder(this)
+        val view = layoutInflater.inflate(R.layout.layout_modal_add, null)
+        dialog.setView(view)
+        val courseNameEditText = view.findViewById<EditText>(R.id.txt_add_name)
+
+        dialog.setPositiveButton("Adicionar") { _, _ ->
+            val courseName = courseNameEditText.text.toString()
+            if (courseName.isNotBlank()) {
+                val newCourse = Course(name = courseName)
+                addCourse(newCourse)
+                ScrollToLastPosition.withDelay(recyclerView,adapter,2000)
+            } else {
+                Toast.makeText(applicationContext, "Nome do curso não pode estar em branco", Toast.LENGTH_LONG).show()
+            }
+        }
+
+        dialog.setNegativeButton("Cancelar", null)
+
+        dialog.show()
+    }
+
+    private fun addCourse(newCourse: Course) {
+        val call = courseService.save(newCourse)
+
+        call.enqueue(object : Callback<Course> {
+            override fun onResponse(call: Call<Course>, response: Response<Course>) {
+                if (response.isSuccessful) {
+                    Toast.makeText(applicationContext, "Curso adicionado com sucesso.", Toast.LENGTH_LONG).show()
+                    loadCourses()
+                } else {
+                    Toast.makeText(applicationContext, "Falha ao adicionar o curso.", Toast.LENGTH_LONG).show()
+                }
+            }
+
+            override fun onFailure(call: Call<Course>, t: Throwable) {
+                Toast.makeText(applicationContext, "Falha ao executar Requisição.", Toast.LENGTH_LONG).show()
+            }
+        })
+    }
+
+    // Função para carregar cursos da API
+    private fun loadCourses() {
+        val call = courseService.listAll()
+        call.enqueue( object : Callback<List<Course>> {
+            override fun onResponse(call: Call<List<Course>>, response: Response<List<Course>>) {
+                if (response.isSuccessful) {
+                    val courses = response.body() // Obtenha os cursos da resposta
+
+                    if (courses != null) {
+                        adapter.reloadList(courses)
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<List<Course>>, t: Throwable) {
+                Toast.makeText(
+                    applicationContext,
+                    "Falha ao executar Requisição.",
+                    Toast.LENGTH_LONG
+                ).show()
+                loadCourses()
+            }
+        })
+    }
+
+
+    private fun showIdLocation() {
+        val view = layoutInflater.inflate(R.layout.layout_modal_find, null)
+        val findIdTxt = view.findViewById<EditText>(R.id.txt_find_id)
+
+        val dialogBuilder = AlertDialog.Builder(this)
+        dialogBuilder.setView(view)
+
+        dialogBuilder.setPositiveButton("Procurar") { dialog, which ->
+            val courseId = findIdTxt.text.toString().toIntOrNull()
+
+            if (courseId != null) {
+                val position = findCoursePosition(courseId)
+                if (position != -1) {
+                    recyclerView.smoothScrollToPosition(position)
+                } else {
+                    Toast.makeText(applicationContext, "Curso com ID $courseId não encontrado.", Toast.LENGTH_LONG).show()
+                }
+            } else {
+                Toast.makeText(applicationContext, "ID de curso inválido.", Toast.LENGTH_LONG).show()
+            }
+        }
+
+        dialogBuilder.setNegativeButton("Cancelar", null)
+
+        val alertDialog = dialogBuilder.create()
+        alertDialog.show()
+    }
+
+    private fun findCoursePosition(courseId: Int): Int {
+        for (i in adapter.items.indices) {
+            if (adapter.items[i].id == courseId) {
+                return i
+            }
+        }
+        return -1 // Retorna -1 se o curso não for encontrado na lista
+    }
+
     //encontrar por Nome usando SearchView
     private fun initiSearchView() {
         searchView = findViewById(R.id.searchView)
@@ -104,11 +207,10 @@ class CursoView : AppCompatActivity() {
                         ).show()
                     }
                 } else {
-                  //  adapter.notifyDataSetChanged()// Se a consulta estiver vazia, você pode realizar ações relevantes aqui
+                    //  adapter.notifyDataSetChanged()// Se a consulta estiver vazia, você pode realizar ações relevantes aqui
                     adapter.clearSearch()
 
                 }
-                loadCourses()
                 return true
             }
 
@@ -117,28 +219,31 @@ class CursoView : AppCompatActivity() {
 
     }
 
-
-    private fun showAddCourseDialog() {
+    private fun showUpdateCourseDialog(course: Course) {
         val dialog = AlertDialog.Builder(this)
-        val view = layoutInflater.inflate(R.layout.layout_modal_add, null)
+        val view = layoutInflater.inflate(R.layout.layout_modal_update, null)
         dialog.setView(view)
 
-        // Configurar os elementos do modal, como EditTexts, botões, etc., para permitir ao usuário inserir os detalhes do curso.
+        val updateName: EditText = view.findViewById(R.id.txt_att_Name)
+        val idModalUpdate: TextView = view.findViewById(R.id.txt_att_id)
 
-        dialog.setPositiveButton("Adicionar") { _, _ ->
-            // Extrair os detalhes do curso do modal
-            val courseName = view.findViewById<EditText>(R.id.txt_add_name).text.toString()
+        idModalUpdate.text = course.id.toString()
+        updateName.setText(course.name)
 
-            if (courseName.isNotBlank()) {
-                val newCourse = Course(name = courseName) // Criar um objeto Course com os detalhes inseridos
-                addCourse(newCourse) // Enviar o novo curso para o servidor usando o Retrofit
-                scrollToLastPositionWithDelay(recyclerView, adapter, 2000)
+        dialog.setPositiveButton("Atualizar") { _, _ ->
+            val newName = updateName.text.toString()
+
+            if (newName.isNotBlank()) {
+                /*
+                Verifique se course.id não é nulo (usando a operação segura de chamada ?.).
+                Se course.id não for nulo, execute o bloco de código dentro de { }.
+                Dentro do bloco, it representa o valor de course.id (que não é nulo),
+                e updateCourseName(it, newName) é chamado com esse valor.
+                 */
+                course.id?.let{ updateCourseName(it,newName)}
+
             } else {
-                Toast.makeText(
-                    applicationContext,
-                    "Nome do curso não pode estar em branco",
-                    Toast.LENGTH_LONG
-                ).show()
+                Toast.makeText(applicationContext, "Nome do curso não pode estar em branco", Toast.LENGTH_LONG).show()
             }
         }
 
@@ -147,233 +252,24 @@ class CursoView : AppCompatActivity() {
         dialog.show()
     }
 
-    // Adicionar curso
-    private fun addCourse(newCourse: Course) {
-        val call = courseService.save(newCourse)
-
-
-        call.enqueue(object : Callback<Course> {
-            override fun onResponse(call: Call<Course>, response: Response<Course>) {
-                if (response.isSuccessful) {
-                        Toast.makeText(
-                            applicationContext,
-                            "Curso adicionado com sucesso.",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    //val addedCourse = response.body() // Curso adicionado retornado pelo servidor
-                    // Atualize a UI ou faça qualquer ação necessária após adicionar o curso
-                    adapter.filteredList.clear()
-                    loadCourses()
-
-                }
-            }
-
-            override fun onFailure(call: Call<Course>, t: Throwable) {
-                // Lida com falhas na chamada à API, se necessário
-            }
-        })
-    }
-
-    fun scrollToLastPositionWithDelay(
-        recyclerView: RecyclerView,
-        adapter: RecyclerView.Adapter<*>,
-        delayMillis: Long = 1000 // Valor padrão de 1000 milissegundos (1 segundo)
-    ) {
-        val handler = Handler(Looper.getMainLooper())
-
-        handler.postDelayed({
-            val lastPosition = adapter.itemCount - 1
-            recyclerView.smoothScrollToPosition(lastPosition)
-        }, delayMillis)
-    }
-
-
-    // Função para carregar cursos da API
-    private fun loadCourses() {
-        executeAsync(courseService.listAll(), object : Callback<List<Course>> {
-            override fun onResponse(call: Call<List<Course>>, response: Response<List<Course>>) {
-                if (response.isSuccessful) {
-                    val courses = response.body() // Obtenha os cursos da resposta
-
-                    if (courses != null) {
-                        // Certifique-se de que courses não seja nulo
-                        adapter.itens.clear()
-                        adapter.itens.addAll(courses)// Adicionando os cursos carregados na lista filteredList durante a inicialização da tela, você garante que a lista completa de cursos seja exibida assim que a tela é carregada
-                        adapter.filteredList.addAll(courses) // adiciona os cursos para poder ser consultado
-                        adapter.notifyDataSetChanged()
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call<List<Course>>, t: Throwable) {
-                Toast.makeText(
-                    applicationContext,
-                    "Falha ao executar Requisição.",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-        })
-    }
-
-    // Função genérica para fazer chamadas assíncronas
-    private fun <T> executeAsync(call: Call<T>, callback: Callback<T>) {
-        call.enqueue(callback)
-    }
-
-    private fun showIdLocation() {
-        val view = layoutInflater.inflate(R.layout.layout_modal_find, null)
-        val editText = view.findViewById<EditText>(R.id.txt_find_id)
-
-        val dialogBuilder = AlertDialog.Builder(this)
-        dialogBuilder.setView(view)
-        dialogBuilder.setPositiveButton("Procurar") { dialog, which ->
-            val courseId = editText.text.toString().toIntOrNull()
-
-
-            if (courseId != null) {
-                val position = findCoursePosition(courseId)
-                if (position != -1) {
-                    findById(courseId)
-                } else {
-                    // Agende a exibição do Toast após um pequeno atraso
-                    recyclerView.postDelayed({
-                        Toast.makeText(
-                            applicationContext,
-                            "Curso com ID $courseId não encontrado.",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }, 400) // 100 milliseconds de atraso
-
-                }
-            } else {
-                Toast.makeText(
-                    applicationContext,
-                    "ID de curso inválido.",
-                    Toast.LENGTH_LONG
-                ).show()
-                loadCourses()
-            }
-        }
-
-        dialogBuilder.setNegativeButton("Cancelar", null)
-
-        val alertDialog = dialogBuilder.create()
-        alertDialog.show()
-
-
-    }
-
-    private fun findById(courseId: Int) {
-        try {
-            val position = findCoursePosition(courseId)
-            if (position != -1) {
-                recyclerView.smoothScrollToPosition(position)
-            } else {
-                Toast.makeText(
-                    applicationContext,
-                    "Curso com ID $courseId não encontrado.",
-                    Toast.LENGTH_LONG
-                ).show()
-
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(
-                applicationContext,
-                "Erro ao buscar o curso.",
-                Toast.LENGTH_LONG
-            ).show()
-
-        }
-    }
-
-    private fun findCoursePosition(courseId: Int): Int {
-        for (i in adapter.itens.indices) {
-            if (adapter.itens[i].id == courseId) {
-                return i
-            }
-        }
-        return -1 // Retorna -1 se o curso não for encontrado na lista
-    }
-
-
-    // funcao para editar curso
     private fun updateCourseName(courseId: Int, newName: String) {
         val call = courseService.update(courseId, Course(name = newName))
 
         call.enqueue(object : Callback<Course> {
             override fun onResponse(call: Call<Course>, response: Response<Course>) {
                 if (response.isSuccessful) {
-                    Toast.makeText(
-                        applicationContext,
-                        "Nome do curso atualizado com sucesso.",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    adapter.filteredList.clear()
+                    Toast.makeText(applicationContext, "Nome do curso atualizado com sucesso.", Toast.LENGTH_LONG).show()
                     loadCourses()
                 } else {
                     val errorBody = response.errorBody()?.string()
-                    Log.e("UpdateCourseError", "Erro ao atualizar o nome do curso: $errorBody")
-                    Toast.makeText(
-                        applicationContext,
-                        "Falha ao atualizar o nome do curso.",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Toast.makeText(applicationContext, "Falha ao atualizar o nome do curso: $errorBody", Toast.LENGTH_LONG).show()
                 }
             }
 
             override fun onFailure(call: Call<Course>, t: Throwable) {
-                Toast.makeText(
-                    applicationContext,
-                    "Falha ao executar Requisição.",
-                    Toast.LENGTH_LONG
-                ).show()
+                Toast.makeText(applicationContext, "Falha ao executar Requisição.", Toast.LENGTH_LONG).show()
             }
         })
-    }
-
-
-    private fun showUpdateCourseDialog(courseId: Int, currentName: String) {
-        val dialog = AlertDialog.Builder(this)
-        val view = layoutInflater.inflate(R.layout.layout_modal_update, null)
-        dialog.run {
-            setView(view)
-        }
-
-        // Aqui você deve usar a função findCoursePosition para encontrar a posição do curso no adaptador
-        val position = findCoursePosition(courseId)
-
-        if (position != -1) {
-            val editText: EditText = view.findViewById(R.id.txt_att_Name)
-            val idModalUpdate: TextView = view.findViewById(R.id.txt_att_id)
-
-            idModalUpdate.text = courseId.toString()
-            editText.setText(currentName)
-
-            dialog.setPositiveButton("Atualizar") { _, _ ->
-                val newName = editText.text.toString()
-
-                if (newName.isNotBlank()) {
-                    updateCourseName(courseId, newName)
-                } else {
-                    Toast.makeText(
-                        applicationContext,
-                        "Nome do curso não pode estar em branco",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-            }
-
-            dialog.setNegativeButton("Cancelar", null)
-
-            dialog.show()
-        } else {
-            Toast.makeText(
-                applicationContext,
-                "Curso com ID $courseId não encontrado.",
-                Toast.LENGTH_LONG
-            ).show()
-        }
     }
 
     private fun deleteCourse(courseId: Int, callback: (success: Boolean) -> Unit) {
@@ -411,7 +307,6 @@ class CursoView : AppCompatActivity() {
         })
     }
 
-
     // Implemente a classe ItemTouchHelperCallback para lidar com arrastar e excluir
     inner class ItemTouchHelperCallback : ItemTouchHelper.SimpleCallback(
         0, // Não estamos implementando arrastar, então definimos para 0
@@ -436,10 +331,8 @@ class CursoView : AppCompatActivity() {
                     // A exclusão foi bem-sucedida, você pode tomar ações adicionais, se necessário.
                     // Por exemplo, recarregar a lista de cursos após a exclusão.
                     adapter.filteredList.removeAt(viewHolder.adapterPosition) // Remove da filteredList
-                    adapter.itens.remove(deletedCourse) // Remove da lista original
+                    adapter.items.remove(deletedCourse) // Remove da lista original
                     adapter.notifyItemRemoved(viewHolder.adapterPosition)
-                    loadCourses()
-                    loadCourses()
                 } else {
                     // A exclusão falhou, você pode lidar com isso de acordo com as necessidades do seu aplicativo.
                     Toast.makeText(
@@ -448,7 +341,6 @@ class CursoView : AppCompatActivity() {
                         Toast.LENGTH_LONG
                     ).show()
                     // Como a exclusão não foi bem-sucedida, você pode precisar recarregar os cursos do servidor
-                    loadCourses()
                 }
             }
         }

@@ -16,10 +16,6 @@ interface CourseService {
     @GET("course/list")
     fun listAll(): Call<List<Course>>
 
-    @GET("course/{id}")
-    fun findById(
-        @Path("id") id: Int
-    ): Call<Course>
 
     @POST("course/new")
     fun save(
