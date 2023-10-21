@@ -22,7 +22,14 @@ abstract class AdapterDefault<T : Any>(var itens: MutableList<T>):RecyclerView.A
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(filteredList[position])
+        holder.itemView.setOnClickListener {
+            onItemClick?.invoke(position)
+        }
     }
+
+    var onItemClick : ((Int)-> Unit)? = null
+
+
 
     fun setFilteredList(query: String): Boolean{
         filteredList.clear()
@@ -67,6 +74,7 @@ abstract class AdapterDefault<T : Any>(var itens: MutableList<T>):RecyclerView.A
                         txtFieldId.text = course.id.toString()
                         txtFieldName.text = course.name
                     }
+                    // ESCREVER  QUANDO ITEM FOR UM DEPARTAMENTO .
                 }
             }
 

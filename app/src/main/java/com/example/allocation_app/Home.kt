@@ -11,11 +11,19 @@ class Home : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
-        val btcourse = findViewById<ImageButton>(R.id.ibCourse)
-        btcourse.setOnClickListener{
-            val intent = Intent (this, CursoView::class.java)
-            startActivity(intent)
-       }
+        //troca tudo que for course por department
+        val btCourse = findViewById<ImageButton>(R.id.ibCourse)
+        btCourse.setOnClickListener {
+            startNewActivity(CursoView::class.java)
+        }
 
+
+
+    }
+
+    // Função genérica para iniciar uma nova atividade
+    private fun startNewActivity(activityClass: Class<*>) {
+        val intent = Intent(this, activityClass)
+        startActivity(intent)
     }
 }

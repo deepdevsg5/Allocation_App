@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_centerVertical="true"
+    android:layout_centerHorizontal="true"
+    android:layout_gravity="center">
+
+
+    <TextView
+        android:id="@+id/title_modal_att"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Atualizar Item"
+        android:textSize="30sp"
+        android:layout_centerHorizontal="true"
+        android:textAlignment="center"
+        android:layout_marginTop="16dp"/>
+
+    <TextView
+        android:id="@+id/title_modal_att_id"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ID"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_centerHorizontal="true"
+        android:textAlignment="textStart"
+        android:layout_below="@id/title_modal_att"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="20dp" />
+
+    <EditText
+        android:id="@+id/txt_modal_att_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/title_modal_att_id"
+        android:layout_margin="8dp"
+        android:hint="Digite o novo Nome "/>
+
+
+
+</RelativeLayout>

@@ -6,6 +6,7 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 // inclusao de novas requisições
 
@@ -18,6 +19,11 @@ interface CourseService {
     fun save(@Body course: Course): Call<Course>
 
 
+    @PUT("course/update/{id}")
+    fun update(
+       @Path("id") courseId :Int ,
+       @Body course: Course
+    ): Call<Course>
 
     @DELETE("course/{id}")
     fun deleteById(@Path("id") id : Int): Call<Void>

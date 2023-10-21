@@ -2,6 +2,7 @@ package com.example.allocation_app.views
 
 import android.os.Bundle
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -53,6 +54,15 @@ class CursoView : AppCompatActivity() {
         val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
+        // habilitar o click nos itens do adpter
+        adapter.onItemClick = {position ->
+            val course = adapter.filteredList[position]
+            course.id?.let { courseId->
+                showUpdateCourseDialog(course)
+            }
+
+        }
+
         // iniciar ferramenta de procura por nome
         initSearchView()
 
@@ -72,7 +82,55 @@ class CursoView : AppCompatActivity() {
 
     }
 
+    private fun showUpdateCourseDialog(course: Course) {
+         val dialog = AlertDialog.Builder(this)
+         val view = layoutInflater.inflate(R.layout.layout_modal_update, null)
+         dialog.setView(view)
 
+        // atribuir os campos do modal à função
+        val updateName: EditText = view.findViewById(R.id.txt_modal_att_name)
+        val idModalUpdate: TextView = view.findViewById(R.id.title_modal_att_id)
+
+        //atribuir o id da classe , em vez de pegar o id do RecyclerView
+        idModalUpdate.text = course.id.toString()
+        updateName.setText(course.name)
+
+        dialog.setPositiveButton("Atualizar"){ _, _ ->
+            val newName = updateName.text.toString()
+            if(newName.isNotBlank()) {
+                course.id?.let { updateCourseName(it, newName) }
+            }else {
+                Toast.makeText(applicationContext, "Nome do Curso não pode estar em branco", Toast.LENGTH_LONG).show()
+
+            }
+        }
+
+        dialog.setNegativeButton("Cancelar",null)
+        dialog.show()
+
+    }
+
+    private fun updateCourseName(courseId: Int, newName: String) {
+        val call = courseService.update(courseId, Course(name = newName))
+        call.enqueue(object : Callback<Course> {
+            override fun onResponse(call: Call<Course>, response: Response<Course>) {
+                if (response.isSuccessful){
+                    Toast.makeText(applicationContext, "Nome do Curso Atualizado com Sucesso", Toast.LENGTH_LONG).show()
+                    loadCourses()
+
+                } else{
+                    val erroBody = response.errorBody()?.string()
+                    Toast.makeText(applicationContext, "Falha ao atualizar nome do Curso: $erroBody", Toast.LENGTH_LONG).show()
+                }
+            }
+
+            override fun onFailure(call: Call<Course>, t: Throwable) {
+                Toast.makeText(applicationContext, "Falha ao executar a requisição ", Toast.LENGTH_LONG).show()
+            }
+
+        })
+
+    }
 
 
     // Função para carregar cursos da API
@@ -104,7 +162,7 @@ class CursoView : AppCompatActivity() {
     // abre uma janela para interação com usuário
     private fun showAddCourseDialog() {
         val dialog = AlertDialog.Builder(this)
-        val view = layoutInflater.inflate(R.layout.layout_modal_add_course, null)
+        val view = layoutInflater.inflate(R.layout.layout_modal_add, null)
 
         // abre o modal
         dialog.setView(view)
