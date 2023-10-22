@@ -1,8 +1,11 @@
 package com.example.allocation_app.config
 
 import com.example.allocation_app.services.CourseService
+import com.example.allocation_app.services.DepartmentService
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.create
+
 
 object RetrofitConfig {
   private lateinit var retrofit : Retrofit
@@ -16,6 +19,10 @@ object RetrofitConfig {
   }
   fun courseService():CourseService{
       return retrofit.create(CourseService::class.java)
+  }
+
+  fun departmentService(): DepartmentService{
+     return retrofit.create(DepartmentService::class.java)
   }
 
 }

@@ -18,10 +18,10 @@
             android:name=".views.CursoView"
             android:exported="false" />
 
-<!--        <activity-->
-<!--            android:name=".views.DepartmnentView"-->
-<!--            android:exported="false" />-->
-<!--        -->
+        <activity
+            android:name=".views.DepartmentView"
+            android:exported="false" />
+
         <activity
             android:name=".Home"
             android:exported="true" >

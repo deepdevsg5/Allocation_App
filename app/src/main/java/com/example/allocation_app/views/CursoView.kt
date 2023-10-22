@@ -49,15 +49,15 @@ class CursoView : AppCompatActivity() {
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        // Conectar o ItemTouchHelper ao RecyclerView
+        // DELETE - Conectar o ItemTouchHelper ao RecyclerView
         val itemTouchHelperCallback = ItemTouchHelperCallback()
         val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
-        // habilitar o click nos itens do adpter
-        adapter.onItemClick = {position ->
+        // UPDATE -habilitar o click nos itens do adpter
+        adapter.onItemClick = { position ->
             val course = adapter.filteredList[position]
-            course.id?.let { courseId->
+            course.id?.let { courseId ->
                 showUpdateCourseDialog(course)
             }
 
@@ -66,9 +66,10 @@ class CursoView : AppCompatActivity() {
         // iniciar ferramenta de procura por nome
         initSearchView()
 
-        // Aqui você deve chamar a função para carregar os cursos da API
+        // GET- Aqui você deve chamar a função para carregar os cursos da API
         loadCourses()
 
+        // POST
         val addButtom: FloatingActionButton = findViewById(R.id.fab_add)
         addButtom.setOnClickListener {
             showAddCourseDialog()
@@ -80,12 +81,14 @@ class CursoView : AppCompatActivity() {
             showIdLocationDialog()
         }
 
+        //fim da função oncreate
     }
+    // Início a classe CourseView
 
     private fun showUpdateCourseDialog(course: Course) {
-         val dialog = AlertDialog.Builder(this)
-         val view = layoutInflater.inflate(R.layout.layout_modal_update, null)
-         dialog.setView(view)
+        val dialog = AlertDialog.Builder(this)
+        val view = layoutInflater.inflate(R.layout.layout_modal_update, null)
+        dialog.setView(view)
 
         // atribuir os campos do modal à função
         val updateName: EditText = view.findViewById(R.id.txt_modal_att_name)
@@ -95,17 +98,21 @@ class CursoView : AppCompatActivity() {
         idModalUpdate.text = course.id.toString()
         updateName.setText(course.name)
 
-        dialog.setPositiveButton("Atualizar"){ _, _ ->
+        dialog.setPositiveButton("Atualizar") { _, _ ->
             val newName = updateName.text.toString()
-            if(newName.isNotBlank()) {
+            if (newName.isNotBlank()) {
                 course.id?.let { updateCourseName(it, newName) }
-            }else {
-                Toast.makeText(applicationContext, "Nome do Curso não pode estar em branco", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(
+                    applicationContext,
+                    "Nome do Curso não pode estar em branco",
+                    Toast.LENGTH_LONG
+                ).show()
 
             }
         }
 
-        dialog.setNegativeButton("Cancelar",null)
+        dialog.setNegativeButton("Cancelar", null)
         dialog.show()
 
     }
@@ -114,18 +121,30 @@ class CursoView : AppCompatActivity() {
         val call = courseService.update(courseId, Course(name = newName))
         call.enqueue(object : Callback<Course> {
             override fun onResponse(call: Call<Course>, response: Response<Course>) {
-                if (response.isSuccessful){
-                    Toast.makeText(applicationContext, "Nome do Curso Atualizado com Sucesso", Toast.LENGTH_LONG).show()
+                if (response.isSuccessful) {
+                    Toast.makeText(
+                        applicationContext,
+                        "Nome do Curso Atualizado com Sucesso",
+                        Toast.LENGTH_LONG
+                    ).show()
                     loadCourses()
 
-                } else{
+                } else {
                     val erroBody = response.errorBody()?.string()
-                    Toast.makeText(applicationContext, "Falha ao atualizar nome do Curso: $erroBody", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        applicationContext,
+                        "Falha ao atualizar nome do Curso: $erroBody",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
 
             override fun onFailure(call: Call<Course>, t: Throwable) {
-                Toast.makeText(applicationContext, "Falha ao executar a requisição ", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    applicationContext,
+                    "Falha ao executar a requisição ",
+                    Toast.LENGTH_LONG
+                ).show()
             }
 
         })
@@ -234,10 +253,15 @@ class CursoView : AppCompatActivity() {
                 if (position != -1) {
                     recyclerView.smoothScrollToPosition(position)
                 } else {
-                    Toast.makeText(applicationContext, "Curso com ID $courseId não encontrado.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        applicationContext,
+                        "Curso com ID $courseId não encontrado.",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             } else {
-                Toast.makeText(applicationContext, "ID de curso inválido.", Toast.LENGTH_LONG).show()
+                Toast.makeText(applicationContext, "ID de curso inválido.", Toast.LENGTH_LONG)
+                    .show()
             }
         }
 
@@ -291,33 +315,6 @@ class CursoView : AppCompatActivity() {
     }
 
 
-
-    private fun deleteCourse(courseId: Int) {
-        val call = courseService.deleteById(courseId)
-        call.enqueue(object : Callback<Void> {
-            override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                if (response.isSuccessful) {
-                    Toast.makeText(
-                        applicationContext,
-                        "Curso excluido com Sucesso.",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-
-            }
-
-            override fun onFailure(call: Call<Void>, t: Throwable) {
-                Toast.makeText(
-                    applicationContext,
-                    "Falha ao executar a requisição.",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-
-        })
-
-    }
-
     // Implemente a classe ItemTouchHelperCallback para lidar com arrastar e excluir
     inner class ItemTouchHelperCallback : ItemTouchHelper.SimpleCallback(
         0, // Não estamos implementando arrastar, então definimos para 0
@@ -334,20 +331,57 @@ class CursoView : AppCompatActivity() {
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
             val position = viewHolder.adapterPosition
             val deletedCourse = adapter.filteredList[position]
+            val courseId = deletedCourse.id ?: -1
 
-            //Remove o curso do Recicleview
-            adapter.itens.removeAt(viewHolder.adapterPosition)
-            adapter.notifyItemRemoved(viewHolder.adapterPosition)
+            deleteCourse(courseId) { success ->
+                if (success) {
+                    adapter.filteredList.removeAt(viewHolder.adapterPosition) // Remove da filteredList
+                    adapter.itens.remove(deletedCourse) // Remove da lista original
+                    adapter.notifyItemRemoved(viewHolder.adapterPosition)
+                } else {
+                    Toast.makeText(
+                        applicationContext,
+                        "Falha ao excluir o curso",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
 
-            // agora se consegue excluir o curso da API usando ID
-            deletedCourse.id?.let { deleteCourse(it) }
+        private fun deleteCourse(courseId: Int, callback: (success: Boolean) -> Unit) {
+            val call = courseService.deleteById(courseId)
 
+            call.enqueue(object : Callback<Void> {
+                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                    if (response.isSuccessful) {
+                        Toast.makeText(
+                            applicationContext,
+                            "Curso Excluído com Sucesso.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        callback(true) // Indica que a exclusão foi bem-sucedida
+                    } else {
+                        // Trate o caso em que a exclusão falha
+                        Toast.makeText(
+                            applicationContext,
+                            "Falha ao excluir o curso",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        callback(false) // Indica que a exclusão falhou
+                    }
+                }
+
+                override fun onFailure(call: Call<Void>, t: Throwable) {
+                    // Trate a falha na chamada à API
+                    Toast.makeText(
+                        applicationContext,
+                        "Falha ao executar Requisição.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    callback(false) // Indica que a exclusão falhou devido a uma falha na chamada à API
+                }
+            })
         }
     }
-
-
-
 }
-
-
 

@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageButton
 import com.example.allocation_app.views.CursoView
+import com.example.allocation_app.views.DepartmentView
 
 class Home : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,7 +18,10 @@ class Home : AppCompatActivity() {
             startNewActivity(CursoView::class.java)
         }
 
-
+        val btDepartment = findViewById<ImageButton>(R.id.ibDepartment)
+         btDepartment.setOnClickListener {
+             startNewActivity(DepartmentView::class.java)
+         }
 
     }
 

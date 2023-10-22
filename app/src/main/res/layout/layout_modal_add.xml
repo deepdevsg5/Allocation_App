@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/title_modal_add"
         android:layout_margin="8dp"
-        android:hint="Nome do Curso"/>
+        android:hint="Nome "/>
 
 
 

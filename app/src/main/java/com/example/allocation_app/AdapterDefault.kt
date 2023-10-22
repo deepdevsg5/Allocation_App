@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.allocation_app.model.Course
+import com.example.allocation_app.model.Department
 
 abstract class AdapterDefault<T : Any>(var itens: MutableList<T>):RecyclerView.Adapter<AdapterDefault<T>.ViewHolder>(){
 
@@ -20,12 +21,7 @@ abstract class AdapterDefault<T : Any>(var itens: MutableList<T>):RecyclerView.A
     override fun getItemCount(): Int = filteredList.size
 
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(filteredList[position])
-        holder.itemView.setOnClickListener {
-            onItemClick?.invoke(position)
-        }
-    }
+
 
     var onItemClick : ((Int)-> Unit)? = null
 
@@ -59,7 +55,12 @@ abstract class AdapterDefault<T : Any>(var itens: MutableList<T>):RecyclerView.A
         notifyDataSetChanged()
     }
 
-
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bind(filteredList[position])
+        holder.itemView.setOnClickListener {
+            onItemClick?.invoke(position)
+        }
+    }
 
     inner class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
             fun bind(item: T){
@@ -74,7 +75,15 @@ abstract class AdapterDefault<T : Any>(var itens: MutableList<T>):RecyclerView.A
                         txtFieldId.text = course.id.toString()
                         txtFieldName.text = course.name
                     }
-                    // ESCREVER  QUANDO ITEM FOR UM DEPARTAMENTO .
+
+
+                    is Department -> {
+                        val department = item as Department
+                        txtFirstChar.text = department.name.substring(0, 1)
+                        txtFieldId.text = department.id.toString()
+                        txtFieldName.text = department.name
+                    }
+
                 }
             }
 
