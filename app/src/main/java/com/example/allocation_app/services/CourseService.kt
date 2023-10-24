@@ -1,15 +1,14 @@
 package com.example.allocation_app.services
-import com.example.allocation_app.model.Course;
 
-import java.util.List;
-
-import retrofit2.Call;
+import com.example.allocation_app.model.Course
+import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import java.util.List
 
 interface CourseService {
 

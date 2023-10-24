@@ -1,14 +1,16 @@
 package com.example.allocation_app
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageButton
-import com.example.allocation_app.views.CursoView
+import androidx.appcompat.app.AppCompatActivity
+import com.example.allocation_app.views.AllocationView
+import com.example.allocation_app.views.CourseView
 import com.example.allocation_app.views.DepartmentView
 import com.example.allocation_app.views.ProfessorView
 
 class Home : AppCompatActivity() {
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -16,7 +18,7 @@ class Home : AppCompatActivity() {
 
         val btCourse = findViewById<ImageButton>(R.id.ibCourse)
         btCourse.setOnClickListener {
-            startNewActivity(CursoView::class.java)
+            startNewActivity(CourseView::class.java)
         }
 
         val btDepartment: ImageButton = findViewById(R.id.ibDepartment)
@@ -27,6 +29,11 @@ class Home : AppCompatActivity() {
         val btProfessor: ImageButton = findViewById(R.id.ibProfessor)
         btProfessor.setOnClickListener{
             startNewActivity(ProfessorView::class.java)
+        }
+
+        val btAllocation: ImageButton = findViewById(R.id.ibAllocation)
+        btAllocation.setOnClickListener{
+            startNewActivity(AllocationView::class.java)
         }
 
 

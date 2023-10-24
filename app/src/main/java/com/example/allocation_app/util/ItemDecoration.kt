@@ -1,10 +1,9 @@
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.graphics.Rect
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.example.allocation_app.R  // Importe o recurso de cores do seu projeto
+import com.example.allocation_app.R
 
 class HighlightItemDecoration(context: Context) : RecyclerView.ItemDecoration() {
     private val highlightPaint = Paint()

@@ -25,7 +25,7 @@ import retrofit2.Response
 import java.util.List
 
 
-class CursoView : AppCompatActivity() {
+class CourseView : AppCompatActivity() {
 
     private lateinit var adapter: CourseAdapter
     private lateinit var courseService: CourseService
@@ -146,8 +146,14 @@ class CursoView : AppCompatActivity() {
                     Toast.LENGTH_LONG
                 ).show()
                 loadCourses()
+
             }
         })
+    }
+
+    // Novo método público para carregar cursos
+    fun loadCoursesExternally(callback: (List<Course>?) -> Unit) {
+        loadCourses()
     }
 
 

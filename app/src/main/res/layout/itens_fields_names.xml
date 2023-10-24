@@ -6,6 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="3dp"
     android:background="@drawable/card_view_bg"
+    android:backgroundTint="@android:color/white"
     tools:showIn="@layout/itens_fields_names">
 
     <RelativeLayout

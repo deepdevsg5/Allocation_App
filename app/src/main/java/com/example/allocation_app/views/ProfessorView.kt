@@ -1,8 +1,6 @@
 package com.example.allocation_app.views
 
 import android.os.Bundle
-import androidx.appcompat.widget.SearchView
-import androidx.appcompat.widget.SearchView.OnQueryTextListener
 import android.util.Log
 import android.view.View
 import android.widget.EditText
@@ -10,6 +8,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
+import androidx.appcompat.widget.SearchView.OnQueryTextListener
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -288,6 +288,9 @@ class ProfessorView : AppCompatActivity() {
         })
     }
 
+    fun loadProfessorsExternally(callback: (List<Professor>?) -> Unit){
+        loadProfessors()
+    }
 
     private fun showIdLocation() {
         val view = layoutInflater.inflate(R.layout.layout_modal_find, null)

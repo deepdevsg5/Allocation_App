@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.allocation_app.model.Allocation
 import com.example.allocation_app.model.Course
 import com.example.allocation_app.model.Department
 import com.example.allocation_app.model.Professor
@@ -86,7 +87,7 @@ abstract class AdapterDefault<T : Any>(var items: MutableList<T>) : RecyclerView
                     val course = item as Course
                     // Configure os elementos de visualização conforme necessário
 
-                    txtFieldId.text = course.id.toString()
+                    txtFieldId.text = "ID: ${course.id.toString()}"
                     txtFieldName.text = course.name
                     txtFirstChar.text = course.name.substring(0, 1)
                 }
@@ -97,7 +98,7 @@ abstract class AdapterDefault<T : Any>(var items: MutableList<T>) : RecyclerView
 
                     // Configure os elementos de visualização conforme necessário
 
-                    txtFieldId.text = department.id.toString()
+                    txtFieldId.text = "ID: ${department.id.toString()}"
                     txtFieldName.text = department.name
                     txtFirstChar.text = department.name.substring(0, 1)
                 }
@@ -105,15 +106,40 @@ abstract class AdapterDefault<T : Any>(var items: MutableList<T>) : RecyclerView
                 is Professor -> {
                     val professor = item as Professor
 
-                    txtFieldId.text = professor.id.toString()
+                    txtFieldId.text = "id ${professor.id.toString()}"
                     txtFieldName.text = professor.name
                     txtFirstChar.text = professor.name.substring(0,1)
 
-                    txtFieldCpf.text = professor.cpf
+                    txtFieldCpf.text = "CPF: ${professor.cpf}"
                     txtFieldCpf.visibility = View.VISIBLE //ativar o campo
 
-                    txtFieldDepartment.text = professor.departmentName
+                    txtFieldDepartment.text = "Dpto: ${professor.departmentName}"
                     txtFieldDepartment.visibility = View.VISIBLE // ativar o campo
+
+                }
+
+                is Allocation ->{
+
+                    val allocation = item as Allocation
+
+                    txtFieldId.text = "Id : ${allocation.id.toString()}"
+                    txtFieldName.text = allocation.week_day
+                    txtFirstChar.text = allocation.week_day.substring(0,1)
+
+                    " Professor: ${allocation.professorName}".also { txtFieldProfessor.text = it }
+                    txtFieldProfessor.visibility = View.VISIBLE
+
+                    txtFieldCourse.text = "Curso: ${allocation.courseName}"
+                    txtFieldCourse.visibility = View.VISIBLE
+
+
+
+                    txtFieldHourStart.text = "Inicio: ${allocation.startHour}"
+                    txtFieldHourStart.visibility = View.VISIBLE
+
+                    txtFieldHourEnd.text = "Termino: ${allocation.hourEnd}"
+                    txtFieldHourEnd.visibility = View.VISIBLE
+
 
                 }
 

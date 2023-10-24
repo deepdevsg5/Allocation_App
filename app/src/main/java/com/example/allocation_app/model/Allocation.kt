@@ -6,19 +6,19 @@ data class Allocation(
     @SerializedName("id")
     val id: Int? = null,
 
-    @SerializedName("dayOfWeek")
-    val dayOfWeek: String,
+    @SerializedName("week_day")
+    val week_day: String,
 
-    @SerializedName("professorId")
-    val professorId: Int? ,
+    @SerializedName("professor_id")
+    val professorId: Int?,
 
-    @SerializedName("courseId")
-    val courseId: Int? ,
+    @SerializedName("course_id")
+    val courseId: Int?,
 
-    @SerializedName("hourStart")
-    val hourStart: String,
+    @SerializedName("start_hour")
+    val startHour: String,
 
-    @SerializedName("hourEnd")
+    @SerializedName("end_hour")
     val hourEnd: String,
 
      // Campo para armazenar o nome dos campos
@@ -26,6 +26,6 @@ data class Allocation(
 
     var courseName: String? = null,
 
-) {
+    ) {
     companion object
 }
