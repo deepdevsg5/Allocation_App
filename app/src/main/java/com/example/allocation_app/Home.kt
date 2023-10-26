@@ -4,8 +4,10 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageButton
+import com.example.allocation_app.views.AllocationView
 import com.example.allocation_app.views.CursoView
 import com.example.allocation_app.views.DepartmentView
+import com.example.allocation_app.views.ProfessorView
 
 class Home : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,6 +24,17 @@ class Home : AppCompatActivity() {
          btDepartment.setOnClickListener {
              startNewActivity(DepartmentView::class.java)
          }
+
+        val btProfessor = findViewById<ImageButton>(R.id.ibProfessor)
+        btProfessor.setOnClickListener {
+             startNewActivity(ProfessorView::class.java)
+         }
+
+        val btAllocation = findViewById<ImageButton>(R.id.ibAllocation)
+        btAllocation.setOnClickListener {
+             startNewActivity(AllocationView::class.java)
+         }
+
 
     }
 

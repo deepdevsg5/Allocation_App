@@ -23,6 +23,13 @@
             android:exported="false" />
 
         <activity
+            android:name=".views.ProfessorView"
+            android:exported="false" />
+        <activity
+            android:name=".views.AllocationView"
+            android:exported="false" />
+
+        <activity
             android:name=".Home"
             android:exported="true" >
             <intent-filter>
