@@ -1,10 +1,12 @@
 package com.example.allocation_app.config
 
+import com.example.allocation_app.services.AllocationService
 import com.example.allocation_app.services.CourseService
 import com.example.allocation_app.services.DepartmentService
+import com.example.allocation_app.services.ProfessorService
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
+
 
 
 object RetrofitConfig {
@@ -23,6 +25,13 @@ object RetrofitConfig {
 
   fun departmentService(): DepartmentService{
      return retrofit.create(DepartmentService::class.java)
+  }
+  fun professorService(): ProfessorService {
+      return retrofit.create(ProfessorService::class.java)
+  }
+
+  fun allocationService():AllocationService{
+      return retrofit.create(AllocationService::class.java)
   }
 
 }

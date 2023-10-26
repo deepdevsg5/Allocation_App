@@ -5,8 +5,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.allocation_app.model.Allocation
 import com.example.allocation_app.model.Course
 import com.example.allocation_app.model.Department
+import com.example.allocation_app.model.Professor
 
 abstract class AdapterDefault<T : Any>(var itens: MutableList<T>):RecyclerView.Adapter<AdapterDefault<T>.ViewHolder>(){
 
@@ -64,9 +66,16 @@ abstract class AdapterDefault<T : Any>(var itens: MutableList<T>):RecyclerView.A
 
     inner class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
             fun bind(item: T){
-                val txtFirstChar = itemView.findViewById<TextView>(R.id.text_first_char)
-                val txtFieldId = itemView.findViewById<TextView>(R.id.text_field_id)
-                val txtFieldName = itemView.findViewById<TextView>(R.id.text_field_name)
+                val txtFirstChar = itemView.findViewById<TextView>(R.id.txt_first_char)
+                val txtFieldId = itemView.findViewById<TextView>(R.id.txt_fieldId)
+                val txtFieldName = itemView.findViewById<TextView>(R.id.txt_fieldName)
+                val txtFieldCpf = itemView.findViewById<TextView>(R.id.txt_fieldCpf)
+                val txtFieldCourseid = itemView.findViewById<TextView>(R.id.txt_fieldCourse)
+                val txtFieldProfessorId = itemView.findViewById<TextView>(R.id.txt_fieldProfessor)
+                val txtFieldDepartmentid = itemView.findViewById<TextView>(R.id.txt_fieldDepartment)
+                val txtFieldStartHour = itemView.findViewById<TextView>(R.id.txt_fieldHourStart)
+                val txtFieldEndHour = itemView.findViewById<TextView>(R.id.txt_fieldHourEnd)
+
 
                 when (item) {
                     is Course -> {
@@ -76,7 +85,6 @@ abstract class AdapterDefault<T : Any>(var itens: MutableList<T>):RecyclerView.A
                         txtFieldName.text = course.name
                     }
 
-
                     is Department -> {
                         val department = item as Department
                         txtFirstChar.text = department.name.substring(0, 1)
@@ -84,7 +92,46 @@ abstract class AdapterDefault<T : Any>(var itens: MutableList<T>):RecyclerView.A
                         txtFieldName.text = department.name
                     }
 
+                    is Professor -> {
+                      val professor = item as Professor
+                      txtFieldId.text = "id: ${professor.id.toString()}"
+                      txtFieldName.text = professor.name
+                      txtFirstChar.text = professor.name.substring(0,1)
+
+
+                      txtFieldCpf.text = "CPF: ${professor.cpf.substring(0,3)}." +
+                              "${professor.cpf.substring(3,6)}." +
+                              "${professor.cpf.substring(6,9)}" +
+                              "-${professor.cpf.substring(9,11)}"
+                      txtFieldCpf.visibility = View.VISIBLE
+
+                      txtFieldDepartmentid.text = "DPTO:${professor.departmentName}"
+                      txtFieldDepartmentid.visibility  = View.VISIBLE
+
+                  }
+
+                    is Allocation ->{
+                        val allocation = item as Allocation
+
+                        txtFieldName.text = allocation.weekDay
+                        txtFirstChar.text = allocation.weekDay.substring(0,1)
+
+                        txtFieldCourseid.text = "Curso: ${allocation.courseName}"
+                        txtFieldCourseid.visibility = View.VISIBLE
+
+                        txtFieldProfessorId.text = "Prof: ${allocation.professorName}"
+                        txtFieldProfessorId.visibility = View.VISIBLE
+
+                        txtFieldStartHour.text =  "Inicio: ${allocation.startHour}"
+                        txtFieldStartHour.visibility = View.VISIBLE
+
+                        txtFieldEndHour.text =  "Termino: ${allocation.endhour}"
+                        txtFieldEndHour.visibility = View.VISIBLE
+
+                    }
+
                 }
+
             }
 
     }

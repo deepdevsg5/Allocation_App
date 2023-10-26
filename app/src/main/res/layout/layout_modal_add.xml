@@ -25,6 +25,82 @@
         android:layout_margin="8dp"
         android:hint="Nome "/>
 
+    <Spinner
+        android:id="@+id/spinnerDayOfWeek"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txt_modal_add_name"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:scrollbarSize="10dp"
+        android:textSize="20dp"
+        android:visibility="gone"/>
 
+
+
+
+    <EditText
+        android:id="@+id/txt_add_cpf"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/spinnerDayOfWeek"
+        android:layout_margin="8dp"
+        android:hint="Digite o numero do cpf"
+        android:maxLength="11"
+        android:inputType="number"
+        android:visibility="gone" />
+
+    <EditText
+        android:id="@+id/txt_add_idDepartment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txt_add_cpf"
+        android:layout_margin="8dp"
+        android:hint="Digite o id do Departmento"
+        android:inputType="number"
+        android:visibility="gone" />
+
+    <EditText
+        android:id="@+id/txt_add_idProfessor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txt_add_idDepartment"
+        android:layout_margin="8dp"
+        android:hint="Digite o id do Professor"
+        android:inputType="number"
+        android:visibility="gone" />
+
+    <EditText
+        android:id="@+id/txt_add_idCourse"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txt_add_idProfessor"
+        android:layout_margin="8dp"
+        android:hint="Digite o id do Curso"
+        android:inputType="number"
+        android:visibility="gone" />
+
+    <EditText
+        android:id="@+id/txt_add_hourStart"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txt_add_idCourse"
+        android:layout_margin="8dp"
+        android:hint="Digite a hora de inicio"
+        android:inputType="time"
+        android:visibility="gone" />
+
+
+    <EditText
+        android:id="@+id/txt_add_hourEnd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txt_add_hourStart"
+        android:layout_margin="8dp"
+        android:hint="Digite a hora de termino"
+        android:inputType="time"
+        android:visibility="gone" />
 
 </RelativeLayout>
