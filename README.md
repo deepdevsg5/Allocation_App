@@ -30,7 +30,7 @@ Para configurar o projeto em sua máquina, siga as etapas abaixo:
 
 1. Clone este repositório.
 ```bash
-git clone https://github.com/seu-usuario/projeto-locacao.git
+git clone https://github.com/deepdevsg5/Allocation_App
 ```
 
 2. Instale as dependências.
